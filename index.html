@@ -304,6 +304,7 @@
                     <button class="btn btn-primary" id="startBtn">▶ Start</button>
                     <button class="btn btn-secondary" id="pauseBtn">⏸ Pause</button>
                     <button class="btn btn-secondary" id="clearBtn">🗑 Clear</button>
+                    <button class="btn btn-secondary" id="saveBtn">💾 Save</button>
                 </div>
             </div>
 
@@ -631,6 +632,45 @@
             state.points = [];
         }
 
+        // Save image (without grid lines)
+        function saveImage() {
+            // Create a temporary canvas for clean export
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Fill white background
+            tempCtx.fillStyle = '#ffffff';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Draw saved image if exists
+            if (state.savedImage) {
+                tempCtx.putImageData(state.savedImage, 0, 0);
+            }
+
+            // Draw current points
+            if (state.points.length > 1) {
+                tempCtx.lineWidth = state.lineWidth;
+                tempCtx.lineCap = 'round';
+                tempCtx.lineJoin = 'round';
+
+                for (let i = 1; i < state.points.length; i++) {
+                    tempCtx.beginPath();
+                    tempCtx.strokeStyle = state.points[i].color;
+                    tempCtx.moveTo(state.points[i-1].x, state.points[i-1].y);
+                    tempCtx.lineTo(state.points[i].x, state.points[i].y);
+                    tempCtx.stroke();
+                }
+            }
+
+            // Download the image
+            const link = document.createElement('a');
+            link.download = 'spirograph.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+
         // Update display values
         function updateDisplays() {
             document.getElementById('rValueDisplay').textContent = state.R;
@@ -685,6 +725,7 @@
         document.getElementById('startBtn').addEventListener('click', start);
         document.getElementById('pauseBtn').addEventListener('click', pause);
         document.getElementById('clearBtn').addEventListener('click', clear);
+        document.getElementById('saveBtn').addEventListener('click', saveImage);
 
         // Pattern type toggle
         document.querySelectorAll('.toggle-btn').forEach(btn => {
