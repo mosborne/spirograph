@@ -454,6 +454,23 @@
             return `hsl(${hue}, 100%, 60%)`;
         }
 
+        // Calculate greatest common divisor
+        function gcd(a, b) {
+            a = Math.abs(Math.round(a));
+            b = Math.abs(Math.round(b));
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+
+        // Calculate when pattern completes (returns to start)
+        function getPatternPeriod() {
+            const { R, r } = state;
+            const g = gcd(R, r);
+            return 2 * Math.PI * r / g;
+        }
+
         // Draw the spirograph
         function draw() {
             if (state.fadingTrail) {
@@ -540,9 +557,22 @@
             if (!state.isRunning) return;
 
             const speed = state.speed * 0.01;
+            const period = getPatternPeriod();
 
             for (let i = 0; i < 3; i++) {
                 state.t += speed;
+
+                // Check if pattern has completed
+                if (state.t >= period) {
+                    state.t = period; // Snap to exact end
+                    const point = calculatePoint(state.t);
+                    point.color = state.rainbowMode ? getRainbowColor(state.t) : state.color;
+                    state.points.push(point);
+                    draw();
+                    pause();
+                    return;
+                }
+
                 const point = calculatePoint(state.t);
                 point.color = state.rainbowMode ? getRainbowColor(state.t) : state.color;
                 state.points.push(point);
