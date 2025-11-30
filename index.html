@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirograph Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        h1 {
+            width: 100%;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #e94560, #f39c12, #e94560);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .canvas-container {
+            flex: 1;
+            min-width: 500px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        canvas {
+            display: block;
+            background: #0a0a0a;
+            border-radius: 10px;
+            width: 100%;
+            cursor: crosshair;
+        }
+
+        .controls {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .control-section h3 {
+            color: #e94560;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .control-group label span {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #f39c12);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e94560, #f39c12);
+            cursor: pointer;
+            border: none;
+        }
+
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .color-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .color-btn.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 32px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .preset-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85em;
+        }
+
+        .preset-btn:hover {
+            background: rgba(233, 69, 96, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e94560, #f39c12);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            color: #aaa;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .info-text {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 900px) {
+            .canvas-container {
+                min-width: 100%;
+            }
+            .controls {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Spirograph Visualizer ✨</h1>
+
+        <div class="canvas-container">
+            <canvas id="canvas" width="700" height="700"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="control-section">
+                <h3>🎨 Pattern Type</h3>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-type="hypotrochoid">Hypotrochoid</button>
+                    <button class="toggle-btn" data-type="epitrochoid">Epitrochoid</button>
+                </div>
+                <p class="info-text">Hypotrochoid: wheel rolls inside. Epitrochoid: wheel rolls outside.</p>
+            </div>
+
+            <div class="control-section">
+                <h3>⚙️ Wheel Parameters</h3>
+                <div class="control-group">
+                    <label>Fixed Circle (R): <span id="rValueDisplay">200</span></label>
+                    <input type="range" id="rValue" min="50" max="300" value="200">
+                </div>
+                <div class="control-group">
+                    <label>Rolling Circle (r): <span id="rRollingDisplay">75</span></label>
+                    <input type="range" id="rRolling" min="10" max="200" value="75">
+                </div>
+                <div class="control-group">
+                    <label>Pen Distance (d): <span id="penDistDisplay">50</span></label>
+                    <input type="range" id="penDist" min="5" max="200" value="50">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>🎭 Presets</h3>
+                <div class="presets">
+                    <button class="preset-btn" data-r="200" data-rolling="75" data-pen="50">Classic Star</button>
+                    <button class="preset-btn" data-r="200" data-rolling="80" data-pen="80">Flower</button>
+                    <button class="preset-btn" data-r="200" data-rolling="66" data-pen="66">Triangle</button>
+                    <button class="preset-btn" data-r="200" data-rolling="50" data-pen="50">Square</button>
+                    <button class="preset-btn" data-r="200" data-rolling="40" data-pen="40">Pentagon</button>
+                    <button class="preset-btn" data-r="180" data-rolling="30" data-pen="60">Hexagon</button>
+                    <button class="preset-btn" data-r="200" data-rolling="100" data-pen="80">Spiral</button>
+                    <button class="preset-btn" data-r="150" data-rolling="45" data-pen="90">Intricate</button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>🌈 Colors</h3>
+                <div class="color-options">
+                    <button class="color-btn active" style="background: #e94560;" data-color="#e94560"></button>
+                    <button class="color-btn" style="background: #f39c12;" data-color="#f39c12"></button>
+                    <button class="color-btn" style="background: #2ecc71;" data-color="#2ecc71"></button>
+                    <button class="color-btn" style="background: #3498db;" data-color="#3498db"></button>
+                    <button class="color-btn" style="background: #9b59b6;" data-color="#9b59b6"></button>
+                    <button class="color-btn" style="background: #1abc9c;" data-color="#1abc9c"></button>
+                    <button class="color-btn" style="background: #e74c3c;" data-color="#e74c3c"></button>
+                    <button class="color-btn" style="background: #fff;" data-color="#ffffff"></button>
+                </div>
+                <div class="color-picker-wrapper">
+                    <label style="color: #aaa; font-size: 0.9em;">Custom:</label>
+                    <input type="color" id="customColor" value="#e94560">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rainbowMode">
+                    <label for="rainbowMode">Rainbow mode 🌈</label>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>⚡ Animation</h3>
+                <div class="control-group">
+                    <label>Speed: <span id="speedDisplay">5</span></label>
+                    <input type="range" id="speed" min="1" max="20" value="5">
+                </div>
+                <div class="control-group">
+                    <label>Line Width: <span id="lineWidthDisplay">2</span></label>
+                    <input type="range" id="lineWidth" min="1" max="10" value="2">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showWheels" checked>
+                    <label for="showWheels">Show wheels</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="fadingTrail">
+                    <label for="fadingTrail">Fading trail effect</label>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="startBtn">▶ Start</button>
+                    <button class="btn btn-secondary" id="pauseBtn">⏸ Pause</button>
+                    <button class="btn btn-secondary" id="clearBtn">🗑 Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // State
+        let state = {
+            R: 200,           // Fixed circle radius
+            r: 75,            // Rolling circle radius
+            d: 50,            // Pen distance from rolling circle center
+            type: 'hypotrochoid',
+            color: '#e94560',
+            speed: 5,
+            lineWidth: 2,
+            showWheels: true,
+            rainbowMode: false,
+            fadingTrail: false,
+            isRunning: false,
+            t: 0,
+            points: [],
+            animationId: null
+        };
+
+        // Center of canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Calculate point on spirograph
+        function calculatePoint(t) {
+            let x, y;
+            const { R, r, d, type } = state;
+
+            if (type === 'hypotrochoid') {
+                // Inner wheel rolling inside
+                x = (R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t);
+                y = (R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t);
+            } else {
+                // Outer wheel rolling outside
+                x = (R + r) * Math.cos(t) - d * Math.cos((R + r) / r * t);
+                y = (R + r) * Math.sin(t) - d * Math.sin((R + r) / r * t);
+            }
+
+            return { x: centerX + x, y: centerY + y };
+        }
+
+        // Calculate rolling circle center
+        function calculateRollingCenter(t) {
+            const { R, r, type } = state;
+            let x, y;
+
+            if (type === 'hypotrochoid') {
+                x = (R - r) * Math.cos(t);
+                y = (R - r) * Math.sin(t);
+            } else {
+                x = (R + r) * Math.cos(t);
+                y = (R + r) * Math.sin(t);
+            }
+
+            return { x: centerX + x, y: centerY + y };
+        }
+
+        // Get rainbow color based on t
+        function getRainbowColor(t) {
+            const hue = (t * 20) % 360;
+            return `hsl(${hue}, 100%, 60%)`;
+        }
+
+        // Draw the spirograph
+        function draw() {
+            if (state.fadingTrail) {
+                ctx.fillStyle = 'rgba(10, 10, 10, 0.02)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Draw background grid (subtle)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // Draw the curve
+            if (state.points.length > 1) {
+                ctx.lineWidth = state.lineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                for (let i = 1; i < state.points.length; i++) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = state.points[i].color;
+                    ctx.moveTo(state.points[i-1].x, state.points[i-1].y);
+                    ctx.lineTo(state.points[i].x, state.points[i].y);
+                    ctx.stroke();
+                }
+            }
+
+            // Draw wheels if enabled
+            if (state.showWheels) {
+                const rollingCenter = calculateRollingCenter(state.t);
+                const penPoint = calculatePoint(state.t);
+
+                // Fixed circle
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                if (state.type === 'hypotrochoid') {
+                    ctx.arc(centerX, centerY, state.R, 0, Math.PI * 2);
+                } else {
+                    ctx.arc(centerX, centerY, state.R, 0, Math.PI * 2);
+                }
+                ctx.stroke();
+
+                // Rolling circle
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(243, 156, 18, 0.5)';
+                ctx.arc(rollingCenter.x, rollingCenter.y, state.r, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Pen arm
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(233, 69, 96, 0.5)';
+                ctx.moveTo(rollingCenter.x, rollingCenter.y);
+                ctx.lineTo(penPoint.x, penPoint.y);
+                ctx.stroke();
+
+                // Rolling circle center
+                ctx.beginPath();
+                ctx.fillStyle = '#f39c12';
+                ctx.arc(rollingCenter.x, rollingCenter.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Pen point
+                ctx.beginPath();
+                ctx.fillStyle = state.rainbowMode ? getRainbowColor(state.t) : state.color;
+                ctx.arc(penPoint.x, penPoint.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            if (!state.isRunning) return;
+
+            const speed = state.speed * 0.01;
+
+            for (let i = 0; i < 3; i++) {
+                state.t += speed;
+                const point = calculatePoint(state.t);
+                point.color = state.rainbowMode ? getRainbowColor(state.t) : state.color;
+                state.points.push(point);
+            }
+
+            // Limit points for performance
+            if (state.points.length > 50000) {
+                state.points = state.points.slice(-30000);
+            }
+
+            draw();
+            state.animationId = requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        function start() {
+            if (state.isRunning) return;
+            state.isRunning = true;
+            animate();
+        }
+
+        // Pause animation
+        function pause() {
+            state.isRunning = false;
+            if (state.animationId) {
+                cancelAnimationFrame(state.animationId);
+            }
+        }
+
+        // Clear canvas
+        function clear() {
+            pause();
+            state.t = 0;
+            state.points = [];
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            draw();
+        }
+
+        // Update display values
+        function updateDisplays() {
+            document.getElementById('rValueDisplay').textContent = state.R;
+            document.getElementById('rRollingDisplay').textContent = state.r;
+            document.getElementById('penDistDisplay').textContent = state.d;
+            document.getElementById('speedDisplay').textContent = state.speed;
+            document.getElementById('lineWidthDisplay').textContent = state.lineWidth;
+        }
+
+        // Event Listeners
+        document.getElementById('rValue').addEventListener('input', (e) => {
+            state.R = parseInt(e.target.value);
+            updateDisplays();
+            clear();
+        });
+
+        document.getElementById('rRolling').addEventListener('input', (e) => {
+            state.r = parseInt(e.target.value);
+            updateDisplays();
+            clear();
+        });
+
+        document.getElementById('penDist').addEventListener('input', (e) => {
+            state.d = parseInt(e.target.value);
+            updateDisplays();
+            clear();
+        });
+
+        document.getElementById('speed').addEventListener('input', (e) => {
+            state.speed = parseInt(e.target.value);
+            updateDisplays();
+        });
+
+        document.getElementById('lineWidth').addEventListener('input', (e) => {
+            state.lineWidth = parseInt(e.target.value);
+            updateDisplays();
+        });
+
+        document.getElementById('showWheels').addEventListener('change', (e) => {
+            state.showWheels = e.target.checked;
+            draw();
+        });
+
+        document.getElementById('rainbowMode').addEventListener('change', (e) => {
+            state.rainbowMode = e.target.checked;
+        });
+
+        document.getElementById('fadingTrail').addEventListener('change', (e) => {
+            state.fadingTrail = e.target.checked;
+        });
+
+        document.getElementById('startBtn').addEventListener('click', start);
+        document.getElementById('pauseBtn').addEventListener('click', pause);
+        document.getElementById('clearBtn').addEventListener('click', clear);
+
+        // Pattern type toggle
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.type = btn.dataset.type;
+                clear();
+            });
+        });
+
+        // Preset buttons
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.R = parseInt(btn.dataset.r);
+                state.r = parseInt(btn.dataset.rolling);
+                state.d = parseInt(btn.dataset.pen);
+
+                document.getElementById('rValue').value = state.R;
+                document.getElementById('rRolling').value = state.r;
+                document.getElementById('penDist').value = state.d;
+
+                updateDisplays();
+                clear();
+                start();
+            });
+        });
+
+        // Color buttons
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.color = btn.dataset.color;
+                document.getElementById('customColor').value = state.color;
+            });
+        });
+
+        // Custom color picker
+        document.getElementById('customColor').addEventListener('input', (e) => {
+            state.color = e.target.value;
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        });
+
+        // Initial draw
+        clear();
+        updateDisplays();
+    </script>
+</body>
+</html>
