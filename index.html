@@ -663,43 +663,43 @@
             draw();
         }
 
-        // Save image (without grid lines)
+        // Save image (without grid lines or wheels)
         function saveImage() {
-            // Create a temporary canvas for clean export
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            const tempCtx = tempCanvas.getContext('2d');
+            // Save current canvas state
+            const currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-            // Fill white background
-            tempCtx.fillStyle = '#ffffff';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            // Draw clean version on main canvas
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw saved image if exists
+            // Restore clean saved patterns (already without grid/wheels)
             if (state.savedImage) {
-                tempCtx.putImageData(state.savedImage, 0, 0);
+                ctx.putImageData(state.savedImage, 0, 0);
             }
 
             // Draw current points
             if (state.points.length > 1) {
-                tempCtx.lineWidth = state.lineWidth;
-                tempCtx.lineCap = 'round';
-                tempCtx.lineJoin = 'round';
+                ctx.lineWidth = state.lineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
 
                 for (let i = 1; i < state.points.length; i++) {
-                    tempCtx.beginPath();
-                    tempCtx.strokeStyle = state.points[i].color;
-                    tempCtx.moveTo(state.points[i-1].x, state.points[i-1].y);
-                    tempCtx.lineTo(state.points[i].x, state.points[i].y);
-                    tempCtx.stroke();
+                    ctx.beginPath();
+                    ctx.strokeStyle = state.points[i].color;
+                    ctx.moveTo(state.points[i-1].x, state.points[i-1].y);
+                    ctx.lineTo(state.points[i].x, state.points[i].y);
+                    ctx.stroke();
                 }
             }
 
-            // Download the image
+            // Download the clean image
             const link = document.createElement('a');
             link.download = 'spirograph.png';
-            link.href = tempCanvas.toDataURL('image/png');
+            link.href = canvas.toDataURL('image/png');
             link.click();
+
+            // Restore original canvas view (with grid and wheels)
+            ctx.putImageData(currentImage, 0, 0);
         }
 
         // Update display values
