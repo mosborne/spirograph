@@ -402,19 +402,18 @@
         let logicalWidth, logicalHeight, centerX, centerY;
 
         function setupCanvas() {
-            // Get container width (minus padding)
+            // Get container width (minus padding) - fill entire container
             const containerWidth = canvasContainer.clientWidth - 30;
-            const size = Math.min(containerWidth, 800); // Max 800px logical size
 
-            logicalWidth = size;
-            logicalHeight = size;
+            logicalWidth = containerWidth;
+            logicalHeight = containerWidth; // Keep it square
             centerX = logicalWidth / 2;
             centerY = logicalHeight / 2;
 
             // Scale canvas for high-DPI displays
             canvas.width = logicalWidth * dpr;
             canvas.height = logicalHeight * dpr;
-            canvas.style.width = logicalWidth + 'px';
+            canvas.style.width = '100%';
             canvas.style.height = logicalHeight + 'px';
 
             // Reset and apply scale
