@@ -13,9 +13,9 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 50%, #d5dde5 100%);
             min-height: 100vh;
-            color: #fff;
+            color: #333;
         }
 
         .container {
@@ -46,32 +46,33 @@
         .canvas-container {
             flex: 1;
             min-width: 500px;
-            background: rgba(0, 0, 0, 0.3);
+            background: #fff;
             border-radius: 15px;
             padding: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
         }
 
         canvas {
             display: block;
-            background: #0a0a0a;
+            background: #fff;
             border-radius: 10px;
             width: 100%;
             cursor: crosshair;
+            border: 1px solid #e0e0e0;
         }
 
         .controls {
             width: 320px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #fff;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .control-section {
             margin-bottom: 20px;
             padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .control-section:last-child {
@@ -95,11 +96,11 @@
             justify-content: space-between;
             margin-bottom: 5px;
             font-size: 0.9em;
-            color: #aaa;
+            color: #666;
         }
 
         .control-group label span {
-            color: #f39c12;
+            color: #e94560;
             font-weight: bold;
         }
 
@@ -107,7 +108,7 @@
             width: 100%;
             height: 6px;
             border-radius: 3px;
-            background: #333;
+            background: #ddd;
             outline: none;
             -webkit-appearance: none;
         }
@@ -151,8 +152,8 @@
         }
 
         .color-btn.active {
-            border-color: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            border-color: #333;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         .color-picker-wrapper {
@@ -179,17 +180,18 @@
 
         .preset-btn {
             padding: 10px;
-            border: none;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f5f5f5;
+            color: #333;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 0.85em;
         }
 
         .preset-btn:hover {
-            background: rgba(233, 69, 96, 0.3);
+            background: rgba(233, 69, 96, 0.15);
+            border-color: #e94560;
             transform: translateY(-2px);
         }
 
@@ -217,8 +219,9 @@
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #e0e0e0;
         }
 
         .btn:hover {
@@ -239,17 +242,17 @@
         .toggle-btn {
             flex: 1;
             padding: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
             background: transparent;
-            color: #fff;
+            color: #333;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .toggle-btn.active {
             border-color: #e94560;
-            background: rgba(233, 69, 96, 0.2);
+            background: rgba(233, 69, 96, 0.1);
         }
 
         .checkbox-group {
@@ -266,14 +269,14 @@
         }
 
         .checkbox-group label {
-            color: #aaa;
+            color: #555;
             font-size: 0.9em;
             cursor: pointer;
         }
 
         .info-text {
             font-size: 0.8em;
-            color: #666;
+            color: #888;
             margin-top: 5px;
         }
 
@@ -353,10 +356,10 @@
                     <button class="color-btn" style="background: #9b59b6;" data-color="#9b59b6"></button>
                     <button class="color-btn" style="background: #1abc9c;" data-color="#1abc9c"></button>
                     <button class="color-btn" style="background: #e74c3c;" data-color="#e74c3c"></button>
-                    <button class="color-btn" style="background: #fff;" data-color="#ffffff"></button>
+                    <button class="color-btn" style="background: #333;" data-color="#333333"></button>
                 </div>
                 <div class="color-picker-wrapper">
-                    <label style="color: #aaa; font-size: 0.9em;">Custom:</label>
+                    <label style="color: #666; font-size: 0.9em;">Custom:</label>
                     <input type="color" id="customColor" value="#e94560">
                 </div>
                 <div class="checkbox-group">
@@ -474,14 +477,14 @@
         // Draw the spirograph
         function draw() {
             if (state.fadingTrail) {
-                ctx.fillStyle = 'rgba(10, 10, 10, 0.02)';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             } else {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
 
             // Draw background grid (subtle)
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.lineWidth = 1;
             for (let i = 0; i < canvas.width; i += 50) {
                 ctx.beginPath();
@@ -516,7 +519,7 @@
 
                 // Fixed circle
                 ctx.beginPath();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.lineWidth = 2;
                 if (state.type === 'hypotrochoid') {
                     ctx.arc(centerX, centerY, state.R, 0, Math.PI * 2);
@@ -607,7 +610,7 @@
             pause();
             state.t = 0;
             state.points = [];
-            ctx.fillStyle = '#0a0a0a';
+            ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             draw();
         }
