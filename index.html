@@ -626,10 +626,41 @@
         // Reset for new pattern (keeps existing drawing)
         function resetForNewPattern() {
             pause();
-            // Save current canvas content before clearing points
+            // Save a clean version without wheels or grid
+            const tempShowWheels = state.showWheels;
+            state.showWheels = false;
+
+            // Draw clean version to capture
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Restore previous saved image
+            if (state.savedImage) {
+                ctx.putImageData(state.savedImage, 0, 0);
+            }
+
+            // Draw current points without wheels
+            if (state.points.length > 1) {
+                ctx.lineWidth = state.lineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                for (let i = 1; i < state.points.length; i++) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = state.points[i].color;
+                    ctx.moveTo(state.points[i-1].x, state.points[i-1].y);
+                    ctx.lineTo(state.points[i].x, state.points[i].y);
+                    ctx.stroke();
+                }
+            }
+
+            // Save clean canvas content
             state.savedImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
             state.t = 0;
             state.points = [];
+
+            // Restore wheel visibility and redraw with grid
+            state.showWheels = tempShowWheels;
+            draw();
         }
 
         // Save image (without grid lines)
