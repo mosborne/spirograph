@@ -615,6 +615,12 @@
             draw();
         }
 
+        // Reset for new pattern (keeps existing drawing)
+        function resetForNewPattern() {
+            pause();
+            state.t = 0;
+        }
+
         // Update display values
         function updateDisplays() {
             document.getElementById('rValueDisplay').textContent = state.R;
@@ -628,19 +634,19 @@
         document.getElementById('rValue').addEventListener('input', (e) => {
             state.R = parseInt(e.target.value);
             updateDisplays();
-            clear();
+            resetForNewPattern();
         });
 
         document.getElementById('rRolling').addEventListener('input', (e) => {
             state.r = parseInt(e.target.value);
             updateDisplays();
-            clear();
+            resetForNewPattern();
         });
 
         document.getElementById('penDist').addEventListener('input', (e) => {
             state.d = parseInt(e.target.value);
             updateDisplays();
-            clear();
+            resetForNewPattern();
         });
 
         document.getElementById('speed').addEventListener('input', (e) => {
@@ -676,7 +682,7 @@
                 document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 state.type = btn.dataset.type;
-                clear();
+                resetForNewPattern();
             });
         });
 
@@ -692,7 +698,7 @@
                 document.getElementById('penDist').value = state.d;
 
                 updateDisplays();
-                clear();
+                resetForNewPattern();
                 start();
             });
         });
