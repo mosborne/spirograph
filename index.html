@@ -599,24 +599,30 @@
 
             const speed = state.speed * 0.01;
             const period = getPatternPeriod();
+            const threshold = 1.5; // Distance threshold for considering pattern complete
+            const minPoints = 100; // Minimum points before checking for completion
 
             for (let i = 0; i < 3; i++) {
                 state.t += speed;
+                const point = calculatePoint(state.t);
+                point.color = state.rainbowMode ? getRainbowColor(state.t) : state.color;
+                state.points.push(point);
 
-                // Check if pattern has completed
-                if (state.t >= period) {
-                    state.t = period; // Snap to exact end
-                    const point = calculatePoint(state.t);
-                    point.color = state.rainbowMode ? getRainbowColor(state.t) : state.color;
-                    state.points.push(point);
+                // Check if pattern has completed using threshold or period
+                const shouldComplete = state.t >= period || (
+                    state.points.length > minPoints &&
+                    state.points.length > 1 &&
+                    Math.hypot(
+                        point.x - state.points[0].x,
+                        point.y - state.points[0].y
+                    ) < threshold
+                );
+
+                if (shouldComplete) {
                     draw();
                     pause();
                     return;
                 }
-
-                const point = calculatePoint(state.t);
-                point.color = state.rainbowMode ? getRainbowColor(state.t) : state.color;
-                state.points.push(point);
             }
 
             // Limit points for performance
